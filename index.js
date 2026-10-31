@@ -29,6 +29,7 @@ const DEFAULTS = Object.freeze({
     selectionButton: true,
     mobileSheet: true,
     showAvatar: true,
+    shadow: true,
     cacheVer: 1,
 });
 
@@ -540,6 +541,7 @@ function applyLook() {
     win.style.setProperty('--bt-opacity', clamp(Number(S.opacity) || 100, 15, 100) / 100);
     win.style.setProperty('--bt-font', (Number(S.fontSize) || 14) + 'px');
     win.classList.toggle('bt-hover-opaque', !!S.hoverOpaque);
+    win.classList.toggle('bt-noshadow', !S.shadow);
     win.classList.toggle('bt-sheet', isSheet());
 }
 function isSheet() { return S.mobileSheet && ctx().isMobile(); }
@@ -676,6 +678,7 @@ function settingsHtml() {
         ${chk('hoverOpaque', '마우스 올리면 선명하게')}
         ${num('fontSize', '글자 크기(px)', 10, 24)}
         ${chk('showAvatar', '캐릭터 아바타 표시')}
+        ${chk('shadow', '창 그림자')}
         ${chk('selectionButton', '메인 채팅 글자 선택 시 "물어보기" 버튼')}
         ${chk('mobileSheet', '모바일에서 하단 시트로')}
         <div class="bt-f"><button class="bt-btn bt-reset-pos">창 위치·크기 초기화</button></div>

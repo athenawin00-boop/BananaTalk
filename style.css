@@ -43,6 +43,7 @@
 #bananatalk_win.bt-hover-opaque.bt-dragging,
 #bananatalk_win.bt-hover-opaque[data-panel] { opacity: 1; }
 #bananatalk_win.bt-active { z-index: 3001; }
+#bananatalk_win.bt-noshadow { box-shadow: none !important; }
 #bananatalk_win.bt-minimized { height: auto !important; min-height: 0; resize: none; }
 #bananatalk_win.bt-minimized > :not(.bt-head) { display: none !important; }
 #bananatalk_win * { box-sizing: border-box; }
@@ -191,7 +192,7 @@
 }
 
 /* 모바일 시트 */
-#bananatalk_win.bt-sheet { border-radius: 16px 16px 0 0; resize: none; min-width: 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.35); }
+#bananatalk_win.bt-sheet { border-radius: 16px 16px 0 0 !important; resize: none; min-width: 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.35); }
 #bananatalk_win.bt-sheet .bt-head { cursor: default; }
 #bananatalk_win.bt-sheet .bt-sheet-handle { display: block; position: absolute; top: 0; left: 0; right: 0; height: 14px; touch-action: none; cursor: ns-resize; z-index: 5; }
 #bananatalk_win.bt-sheet .bt-sheet-handle::after { content: ''; display: block; width: 40px; height: 4px; border-radius: 2px; background: currentColor; opacity: 0.35; margin: 5px auto 0; }
