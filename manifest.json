@@ -1,0 +1,12 @@
+{
+    "display_name": "BananaTalk",
+    "loading_order": 100,
+    "requires": [],
+    "optional": ["connection-manager"],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "athenawin00-boop",
+    "version": "0.1.0",
+    "homePage": "https://github.com/athenawin00-boop/BananaTalk",
+    "auto_update": false
+}

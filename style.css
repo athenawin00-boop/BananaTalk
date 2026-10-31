@@ -1,0 +1,230 @@
+/* BananaTalk — 보조 메신저 창 */
+
+#bananatalk_win {
+    --bt-opacity: 1;
+    --bt-font: 14px;
+    /* 기본(st) 테마: 실리태번 변수 */
+    --bt-bg: var(--SmartThemeBlurTintColor, rgba(23, 23, 23, 0.9));
+    --bt-fg: var(--SmartThemeBodyColor, #ddd);
+    --bt-border: var(--SmartThemeBorderColor, rgba(255,255,255,0.15));
+    --bt-head-bg: rgba(0, 0, 0, 0.15);
+    --bt-me-bg: color-mix(in srgb, var(--SmartThemeQuoteColor, #7aa2ff) 35%, transparent);
+    --bt-me-fg: var(--SmartThemeBodyColor, #ddd);
+    --bt-them-bg: rgba(128, 128, 128, 0.18);
+    --bt-them-fg: var(--SmartThemeBodyColor, #ddd);
+    --bt-accent: var(--SmartThemeQuoteColor, #7aa2ff);
+    --bt-input-bg: rgba(0, 0, 0, 0.2);
+    --bt-radius: 14px;
+
+    position: fixed;
+    z-index: 3000;
+    display: none;
+    flex-direction: column;
+    min-width: 260px;
+    min-height: 240px;
+    max-width: 100vw;
+    max-height: 100vh;
+    box-sizing: border-box;
+    background: var(--bt-bg);
+    color: var(--bt-fg);
+    border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    font-size: var(--bt-font);
+    opacity: var(--bt-opacity);
+    overflow: hidden;
+    resize: both;
+    backdrop-filter: blur(var(--blurStrength, 10px));
+    transition: opacity 0.15s;
+}
+#bananatalk_win.bt-open { display: flex; }
+#bananatalk_win.bt-hover-opaque:hover,
+#bananatalk_win.bt-hover-opaque:focus-within,
+#bananatalk_win.bt-hover-opaque.bt-dragging,
+#bananatalk_win.bt-hover-opaque[data-panel] { opacity: 1; }
+#bananatalk_win.bt-active { z-index: 3001; }
+#bananatalk_win.bt-minimized { height: auto !important; min-height: 0; resize: none; }
+#bananatalk_win.bt-minimized > :not(.bt-head) { display: none !important; }
+#bananatalk_win * { box-sizing: border-box; }
+
+/* 머리줄 */
+#bananatalk_win .bt-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    padding: 6px 8px; background: var(--bt-head-bg); border-bottom: 1px solid var(--bt-border);
+    cursor: move; user-select: none; touch-action: none; flex: 0 0 auto;
+}
+#bananatalk_win .bt-head-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+#bananatalk_win .bt-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
+#bananatalk_win .bt-head-text { min-width: 0; }
+#bananatalk_win .bt-title { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#bananatalk_win .bt-sub { font-size: 0.78em; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#bananatalk_win .bt-sub.bt-warn { opacity: 1; color: #e8a33d; }
+#bananatalk_win .bt-head-btns { display: flex; gap: 2px; flex: 0 0 auto; }
+
+/* 아이콘 버튼: 테마의 button 규칙을 이긴다 */
+#bananatalk_win .bt-ib, #bananatalk_win .bt-mb {
+    appearance: none !important; background: transparent !important; border: none !important;
+    color: inherit !important; width: 28px; height: 28px; border-radius: 8px !important; padding: 0 !important; margin: 0 !important;
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95em; box-shadow: none !important;
+    opacity: 0.75;
+}
+#bananatalk_win .bt-ib:hover, #bananatalk_win .bt-mb:hover { opacity: 1; background: rgba(128,128,128,0.2) !important; }
+#bananatalk_win .bt-ib:focus, #bananatalk_win .bt-mb:focus { outline: none; background: rgba(128,128,128,0.2) !important; }
+
+/* 탭 줄 */
+#bananatalk_win .bt-tabs { display: flex; align-items: center; gap: 4px; padding: 4px 6px 0; flex: 0 0 auto; }
+#bananatalk_win .bt-tabs-scroll { display: flex; gap: 4px; overflow-x: auto; flex: 1; min-width: 0; scrollbar-width: none; }
+#bananatalk_win .bt-tabs-scroll::-webkit-scrollbar { display: none; }
+#bananatalk_win .bt-tab {
+    appearance: none !important; background: transparent !important; border: 1px solid transparent !important; color: inherit !important;
+    border-radius: 999px !important; padding: 3px 10px !important; margin: 0 !important; font-size: 0.85em; cursor: pointer; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 5px; max-width: 150px; opacity: 0.7; box-shadow: none !important;
+}
+#bananatalk_win .bt-tab span { overflow: hidden; text-overflow: ellipsis; }
+#bananatalk_win .bt-tab.bt-sel { opacity: 1; font-weight: 700; border-color: var(--bt-accent) !important; background: color-mix(in srgb, var(--bt-accent) 18%, transparent) !important; }
+
+/* 모드 */
+#bananatalk_win .bt-modes { display: flex; gap: 4px; padding: 4px 6px; flex: 0 0 auto; }
+#bananatalk_win .bt-mode {
+    appearance: none !important; flex: 1; background: rgba(128,128,128,0.12) !important; border: 1px solid transparent !important; color: inherit !important;
+    border-radius: 8px !important; padding: 4px 6px !important; margin: 0 !important; font-size: 0.82em; cursor: pointer; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; opacity: 0.75; box-shadow: none !important;
+}
+#bananatalk_win .bt-mode.bt-sel { opacity: 1; font-weight: 700; border-color: var(--bt-accent) !important; background: color-mix(in srgb, var(--bt-accent) 22%, transparent) !important; }
+
+/* 본문 */
+#bananatalk_win .bt-body { position: relative; flex: 1 1 auto; min-height: 0; display: flex; }
+#bananatalk_win .bt-msgs { flex: 1; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+#bananatalk_win .bt-panel { display: none; position: absolute; inset: 0; overflow-y: auto; padding: 8px 10px; background: var(--bt-bg); z-index: 2; }
+#bananatalk_win[data-panel="threads"] .bt-threads-panel, #bananatalk_win[data-panel="settings"] .bt-settings-panel { display: block; }
+
+#bananatalk_win .bt-empty { margin: auto; text-align: center; opacity: 0.6; padding: 20px; font-size: 0.9em; }
+#bananatalk_win .bt-empty i { font-size: 2em; margin-bottom: 8px; display: block; }
+#bananatalk_win .bt-empty-hint { font-size: 0.8em; margin-top: 6px; opacity: 0.7; }
+
+/* 말풍선 */
+#bananatalk_win .bt-row { display: flex; flex-direction: column; max-width: 85%; }
+#bananatalk_win .bt-row.bt-me { align-self: flex-end; align-items: flex-end; }
+#bananatalk_win .bt-row.bt-them { align-self: flex-start; align-items: flex-start; }
+#bananatalk_win .bt-bubble {
+    padding: 7px 11px; border-radius: var(--bt-radius); line-height: 1.45; word-break: break-word; overflow-wrap: anywhere;
+    background: var(--bt-them-bg); color: var(--bt-them-fg); border-radius: var(--bt-radius) !important; border-top-left-radius: 4px !important;
+}
+#bananatalk_win .bt-me .bt-bubble { background: var(--bt-me-bg); color: var(--bt-me-fg); border-top-left-radius: var(--bt-radius) !important; border-top-right-radius: 4px !important; }
+#bananatalk_win .bt-err .bt-bubble { background: rgba(220, 60, 60, 0.25); }
+#bananatalk_win .bt-bubble p { margin: 0 0 0.5em; }
+#bananatalk_win .bt-bubble p:last-child { margin-bottom: 0; }
+#bananatalk_win .bt-bubble pre { white-space: pre-wrap; font-size: 0.85em; }
+#bananatalk_win .bt-bubble blockquote { margin: 0 0 0.5em; padding-left: 8px; border-left: 3px solid var(--bt-accent); opacity: 0.8; }
+#bananatalk_win .bt-bubble img { max-width: 100%; }
+#bananatalk_win .bt-meta { display: flex; align-items: center; gap: 2px; font-size: 0.72em; opacity: 0; margin-top: 1px; transition: opacity 0.15s; }
+#bananatalk_win .bt-row:hover .bt-meta, #bananatalk_win .bt-row:focus-within .bt-meta { opacity: 0.7; }
+#bananatalk_win .bt-mb { width: 22px; height: 20px; font-size: 0.95em; }
+#bananatalk_win .bt-typing i { display: inline-block; width: 6px; height: 6px; margin: 0 2px; border-radius: 50%; background: currentColor; opacity: 0.5; animation: bt-blink 1s infinite; }
+#bananatalk_win .bt-typing i:nth-child(2) { animation-delay: 0.2s; }
+#bananatalk_win .bt-typing i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bt-blink { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+/* 입력 */
+#bananatalk_win .bt-input { display: flex; align-items: flex-end; gap: 6px; padding: 6px 8px 8px; border-top: 1px solid var(--bt-border); flex: 0 0 auto; }
+#bananatalk_win .bt-text {
+    flex: 1; min-width: 0; resize: none; border: 1px solid var(--bt-border); border-radius: 12px; padding: 7px 10px; font: inherit; line-height: 1.4;
+    background: var(--bt-input-bg); color: inherit; max-height: 140px; outline: none;
+}
+#bananatalk_win .bt-text:focus { border-color: var(--bt-accent); }
+#bananatalk_win .bt-send {
+    appearance: none !important; width: 36px; height: 36px; border-radius: 50% !important; border: none !important; cursor: pointer; flex: 0 0 auto;
+    background: var(--bt-accent) !important; color: #fff !important; display: inline-flex; align-items: center; justify-content: center; margin: 0 !important; padding: 0 !important; box-shadow: none !important;
+}
+#bananatalk_win .bt-send.bt-stop { background: #d9534f !important; }
+#bananatalk_win .bt-sheet-handle { display: none; }
+
+/* 대화 목록 패널 */
+#bananatalk_win .bt-panel-title { font-weight: 700; margin-bottom: 6px; }
+#bananatalk_win .bt-dim { opacity: 0.55; font-size: 0.85em; font-weight: 400; }
+#bananatalk_win .bt-thread-item { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 8px; cursor: pointer; }
+#bananatalk_win .bt-thread-item:hover { background: rgba(128,128,128,0.15); }
+#bananatalk_win .bt-thread-item.bt-sel { border: 1px solid var(--bt-accent); background: color-mix(in srgb, var(--bt-accent) 15%, transparent); }
+#bananatalk_win .bt-thread-title { flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px dashed transparent; color: inherit; font: inherit; outline: none; padding: 2px 0; }
+#bananatalk_win .bt-thread-title:focus { border-bottom-color: var(--bt-accent); }
+#bananatalk_win .bt-panel-foot { margin-top: 12px; }
+#bananatalk_win .bt-btn, #bananatalk_settings .bt-btn {
+    appearance: none; background: rgba(128,128,128,0.15); border: 1px solid var(--bt-border, var(--SmartThemeBorderColor)); color: inherit; border-radius: 8px; padding: 5px 10px; cursor: pointer; font: inherit; font-size: 0.9em;
+}
+#bananatalk_win .bt-wipe { color: #e06060; }
+
+/* 설정 (확장 탭·창 안 공통) */
+.bt-settings { display: flex; flex-direction: column; gap: 8px; font-size: 0.92em; }
+.bt-settings .bt-f { display: flex; flex-direction: column; gap: 3px; }
+.bt-settings .bt-f > span { display: flex; align-items: baseline; gap: 6px; }
+.bt-settings .bt-f > span small { opacity: 0.55; font-size: 0.8em; }
+.bt-settings .bt-f-num { flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; }
+.bt-settings .bt-f-num > span { flex-direction: column; gap: 0; align-items: flex-start; min-width: 0; }
+.bt-settings .bt-f-num input { width: 90px; flex: 0 0 auto; }
+.bt-settings .bt-f-chk { flex-direction: row; align-items: center; gap: 6px; }
+.bt-settings .bt-f-row { display: flex; gap: 4px; align-items: center; }
+.bt-settings .bt-f-row select { flex: 1; min-width: 0; }
+.bt-settings input[type="number"], .bt-settings select, .bt-settings textarea { background: rgba(0,0,0,0.2); border: 1px solid var(--SmartThemeBorderColor); color: inherit; border-radius: 6px; padding: 4px 6px; font: inherit; }
+.bt-settings .bt-group { border: 1px solid var(--SmartThemeBorderColor); border-radius: 8px; padding: 4px 8px; }
+.bt-settings .bt-group > summary { cursor: pointer; font-weight: 700; padding: 3px 0; }
+.bt-settings .bt-group > :not(summary) { margin-top: 6px; }
+/* 슬라이더: 직접 그림 (테마의 손잡이 규칙 무시) */
+.bt-settings input[type="range"] {
+    appearance: none !important; -webkit-appearance: none !important; width: 100% !important; height: 18px !important; margin: 0 !important; padding: 0 !important;
+    background: linear-gradient(var(--SmartThemeBorderColor, #666), var(--SmartThemeBorderColor, #666)) center / 100% 4px no-repeat !important; border: none !important; cursor: pointer;
+}
+.bt-settings input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none !important; appearance: none !important; width: 18px !important; height: 18px !important; border-radius: 50% !important; background: var(--SmartThemeQuoteColor, #7aa2ff) !important; border: 2px solid #fff !important; margin: 0 !important; box-shadow: none !important; }
+.bt-settings input[type="range"]::-moz-range-thumb { width: 14px !important; height: 14px !important; border-radius: 50% !important; background: var(--SmartThemeQuoteColor, #7aa2ff) !important; border: 2px solid #fff !important; }
+#bananatalk_win .bt-settings-host .bt-settings input[type="range"]::-webkit-slider-thumb { background: var(--bt-accent) !important; }
+#bananatalk_win .bt-settings-host .bt-settings input[type="number"], #bananatalk_win .bt-settings-host .bt-settings select, #bananatalk_win .bt-settings-host .bt-settings textarea { background: var(--bt-input-bg); border-color: var(--bt-border); }
+#bananatalk_win .bt-settings-host .bt-settings .bt-group { border-color: var(--bt-border); }
+.bananatalk-settings-drawer .bt-drawer-moved { opacity: 0.7; font-size: 0.9em; padding: 6px 0; }
+
+/* 입력창 토글·마법봉 */
+#bananatalk_toggle.bt-on { color: var(--SmartThemeQuoteColor); }
+.bt-hidden { display: none; }
+
+/* 선택 → 물어보기 */
+#bananatalk_selbtn {
+    position: fixed; z-index: 3100; appearance: none; border: none; border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer;
+    background: var(--SmartThemeQuoteColor, #7aa2ff); color: #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.35); white-space: nowrap;
+}
+
+/* 모바일 시트 */
+#bananatalk_win.bt-sheet { border-radius: 16px 16px 0 0; resize: none; min-width: 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.35); }
+#bananatalk_win.bt-sheet .bt-head { cursor: default; }
+#bananatalk_win.bt-sheet .bt-sheet-handle { display: block; position: absolute; top: 0; left: 0; right: 0; height: 14px; touch-action: none; cursor: ns-resize; z-index: 5; }
+#bananatalk_win.bt-sheet .bt-sheet-handle::after { content: ''; display: block; width: 40px; height: 4px; border-radius: 2px; background: currentColor; opacity: 0.35; margin: 5px auto 0; }
+#bananatalk_win.bt-sheet .bt-head { padding-top: 14px; }
+#bananatalk_win.bt-sheet .bt-title { max-width: 40vw; }
+@media (max-width: 420px) {
+    #bananatalk_win .bt-mode { font-size: 0.78em; padding: 4px 4px !important; }
+    #bananatalk_win .bt-row { max-width: 92%; }
+}
+/* 좁은 창: 모드 글자 숨기고 아이콘만 */
+@container bt (max-width: 300px) { #bananatalk_win .bt-mode { font-size: 0; } #bananatalk_win .bt-mode i { font-size: 13px; } }
+#bananatalk_win { container: bt / inline-size; }
+
+/* ---------- 테마 ---------- */
+#bananatalk_win[data-theme="kakao"] {
+    --bt-bg: #b2c7d9; --bt-fg: #1b1b1b; --bt-border: #9fb3c4; --bt-head-bg: #a8bdd0;
+    --bt-me-bg: #fee500; --bt-me-fg: #1b1b1b; --bt-them-bg: #ffffff; --bt-them-fg: #1b1b1b; --bt-accent: #5b8ac7; --bt-input-bg: #fff;
+    backdrop-filter: none;
+}
+#bananatalk_win[data-theme="kakao"] .bt-send { color: #1b1b1b !important; background: #fee500 !important; }
+#bananatalk_win[data-theme="kakao"] .bt-selbtn { background: #fee500; }
+#bananatalk_win[data-theme="telegram"] {
+    --bt-bg: #0e1621; --bt-fg: #e6ecf2; --bt-border: #1f2a37; --bt-head-bg: #17212b;
+    --bt-me-bg: #2b5278; --bt-me-fg: #fff; --bt-them-bg: #182533; --bt-them-fg: #e6ecf2; --bt-accent: #5eb5f7; --bt-input-bg: #17212b;
+    backdrop-filter: none;
+}
+#bananatalk_win[data-theme="dark"] {
+    --bt-bg: #111; --bt-fg: #eaeaea; --bt-border: #2a2a2a; --bt-head-bg: #181818;
+    --bt-me-bg: #3a3a3a; --bt-me-fg: #fff; --bt-them-bg: #1f1f1f; --bt-them-fg: #eaeaea; --bt-accent: #9a9a9a; --bt-input-bg: #1a1a1a;
+    backdrop-filter: none;
+}
+#bananatalk_win[data-theme="mint"] {
+    --bt-bg: #eef7f3; --bt-fg: #16302b; --bt-border: #cfe5dc; --bt-head-bg: #dff0e8;
+    --bt-me-bg: #2bb38a; --bt-me-fg: #fff; --bt-them-bg: #ffffff; --bt-them-fg: #16302b; --bt-accent: #2bb38a; --bt-input-bg: #fff;
+    backdrop-filter: none;
+}
